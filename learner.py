@@ -42,16 +42,16 @@ def accuracy(nb, X, Y):
 def get_PCA_features(X_tr, X_te, n_components=None):
 	pca = PCA(n_components=n_components, svd_solver="randomized")
 	pca.fit(X_tr)
-	t_x_tr = pca.tranform(X_tr)
+	t_x_tr = pca.transform(X_tr)
 	t_x_te = pca.transform(X_te)
 
 	return t_x_tr, t_x_te
 
 
 def get_ICA_features(X_tr, X_te, n_components=None):
-	ica = FastICA()
+	ica = FastICA(n_components=n_components)
 	ica.fit(X_tr)
-	t_x_tr = ica.tranform(X_tr)
+	t_x_tr = ica.transform(X_tr)
 	t_x_te = ica.transform(X_te)
 
 	return t_x_tr, t_x_te
