@@ -41,6 +41,16 @@ def read_data(csvfile,labelname,preprocessor=lambda x : x):
     return df[labelname].values,[preprocessor(string) for string in df['text'].values]
 
 
+def get_vocab_counts(x_tr, x_te):
+	counts = Counter()
+	for bows in [x_tr, x_te]:
+		for bow in bows:
+			for k, v in bow.iteritems():
+				counts[k] += v
+
+	return counts
+
+
 def create_vocab(x_tr, x_te):
 	"""
 	input: training data, a list of bag-of-words (python Counter objects)
@@ -58,9 +68,9 @@ def create_vocab(x_tr, x_te):
 	return vocab
 
 
-def create_mapping(vocab):
+def create_mapping(vocab, K):
 	"""
-	input: vocab set
+	input: vocab, K = size of vocab
 	output: a defaultdict mapping distinct tokens (keys) to indices in a feature array
 	"""
 
@@ -68,16 +78,18 @@ def create_mapping(vocab):
 	# mapping for a word not in the original vocab
 
 	mapping_temp = {token : idx for idx, token in enumerate(vocab)}
-	mapping = defaultdict(lambda: -1, mapping_temp)
+	# any word not in vocab maps to Kth index
+	mapping = defaultdict(lambda: K, mapping_temp)
 
 	return mapping
 
 
-def feature_vector(bow, vocab, mapping):
-	vec_size = len(vocab) + 1  ## the extra spot is for unseen vocab words
+def feature_vector(bow, vocab, K, mapping):
+	vec_size = len(vocab)
 	vec = np.zeros(vec_size)
 	for word, count in bow.iteritems():
 		idx = mapping[word]
-		vec[idx] += count
+		if idx != K:
+			vec[idx] += count
 
 	return vec
